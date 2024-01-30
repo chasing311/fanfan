@@ -11,7 +11,6 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 
 @Slf4j
 @RestController
@@ -80,11 +79,6 @@ public class EmployeeController {
     public Result<String> save(HttpServletRequest request, @RequestBody Employee employee){
         log.info("新增的员工信息：{}",employee.toString());
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
-        Long empId = (Long) request.getSession().getAttribute("employee");
-        employee.setCreateUser(empId);
-        employee.setUpdateUser(empId);
         employeeService.save(employee);
         return Result.success("添加员工成功");
     }
@@ -98,9 +92,6 @@ public class EmployeeController {
     @PostMapping("/edit")
     public Result<String> update(@RequestBody Employee employee, HttpServletRequest request) {
         log.info(employee.toString());
-        Long id = (Long) request.getSession().getAttribute("employee");
-        employee.setUpdateUser(id);
-        employee.setUpdateTime(LocalDateTime.now());
         employeeService.updateById(employee);
         return Result.success("员工信息修改成功");
     }
