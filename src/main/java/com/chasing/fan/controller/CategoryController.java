@@ -29,6 +29,18 @@ public class CategoryController {
     }
 
     /**
+     * 修改分类
+     * @param category
+     * @return
+     */
+    @PostMapping("/edit")
+    public Result<String> update(@RequestBody Category category) {
+        log.info("category:{}", category);
+        categoryService.updateById(category);
+        return Result.success(category.getType() == 1 ? "修改菜品分类成功！" : "修改套餐分类成功！");
+    }
+
+    /**
      * 分类分页查询
      * @param page
      * @param pageSize

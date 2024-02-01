@@ -163,7 +163,8 @@
               'dialogVisible': false,
               'categoryId': '',
               'name': '',
-              sort: ''
+              'sort': '',
+              'type': 0,
             }
           }
         },
@@ -211,6 +212,7 @@
             this.classData.sort = dat.sort
             this.classData.id = dat.id
             this.classData.dialogVisible = true
+            this.classData.type = dat.type;
           },
           // 关闭弹窗
           handleClose(st) {
@@ -270,9 +272,9 @@
             } else if (valid) {
               const reg = /^\d+$/
               if (reg.test(this.classData.sort)) {
-                editCategory({'id':this.classData.id,'name': this.classData.name, sort: this.classData.sort}).then(res => {
+                editCategory({'id':this.classData.id,'name': this.classData.name, sort: this.classData.sort, type: this.classData.type }).then(res => {
                   if (res.code === 1) {
-                    this.$message.success('分类修改成功！')
+                    this.$message.success(res.data)
                     this.classData.dialogVisible = false
                     this.handleQuery()
                   } else {
