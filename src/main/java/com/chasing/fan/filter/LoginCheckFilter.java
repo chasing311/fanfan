@@ -36,7 +36,8 @@ public class LoginCheckFilter implements Filter {
             "/employee/login",
             "/employee/logout",
             "/backend/**",
-            "/front/**"
+            "/front/**",
+            "/common/**"
         };
         if (isUriInWhiteList(requestURI, urlWhiteList)) {
             log.info("本次请求：{}，不需要处理",requestURI);
@@ -45,7 +46,7 @@ public class LoginCheckFilter implements Filter {
         }
         if (request.getSession().getAttribute("employee") != null) {
             Long empId = (Long) request.getSession().getAttribute("employee");
-            BaseContext.setCurrentId(empId);
+//            BaseContext.setCurrentId(empId);
             log.info("用户已登录，id为{}", empId);
             filterChain.doFilter(request,response);
             return;
