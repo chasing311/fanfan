@@ -19,8 +19,8 @@ const deleteSetmeal = (ids) => {
 // 修改数据接口
 const editSetmeal = (params) => {
   return $axios({
-    url: '/setmeal',
-    method: 'put',
+    url: '/setmeal/edit',
+    method: 'post',
     data: { ...params }
   })
 }
@@ -28,7 +28,7 @@ const editSetmeal = (params) => {
 // 新增数据接口
 const addSetmeal = (params) => {
   return $axios({
-    url: '/setmeal',
+    url: '/setmeal/add',
     method: 'post',
     data: { ...params }
   })
