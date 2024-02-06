@@ -1,21 +1,15 @@
 package com.chasing.fan.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chasing.fan.common.Result;
-import com.chasing.fan.entity.Category;
-import com.chasing.fan.entity.DishDTO;
-import com.chasing.fan.entity.Setmeal;
 import com.chasing.fan.entity.SetmealDTO;
-import com.chasing.fan.service.CategoryService;
+import com.chasing.fan.service.SetmealDishService;
 import com.chasing.fan.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/setmeal")
@@ -24,51 +18,84 @@ public class SetmealController {
     @Autowired
     private SetmealService setmealService;
     @Autowired
-    private CategoryService categoryService;
+    private SetmealDishService setmealDishService;
 
+    /**
+     * 套餐分页查询
+     * @param page
+     * @param pageSize
+     * @param name
+     * @return
+     */
     @GetMapping("/page")
     public Result<Page<SetmealDTO>> page(int page, int pageSize, String name) {
-        //构造分页构造器对象
-        Page<Setmeal> pageInfo = new Page<>(page, pageSize);
-        Page<SetmealDTO> setmealDTOPage = new Page<>(page, pageSize);
-        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.like(name != null, Setmeal::getName, name);
-        queryWrapper.orderByDesc(Setmeal::getUpdateTime);
-        setmealService.page(pageInfo, queryWrapper);
-        BeanUtils.copyProperties(pageInfo, setmealDTOPage, "records");
-
-        List<Setmeal> records = pageInfo.getRecords();
-
-        List<SetmealDTO> list = records.stream().map((item) -> {
-            SetmealDTO setmealDto = new SetmealDTO();
-            BeanUtils.copyProperties(item, setmealDto);
-            Long categoryId = item.getCategoryId();
-            Category category = categoryService.getById(categoryId);
-            setmealDto.setCategoryName(category.getName());
-            return setmealDto;
-        }).collect(Collectors.toList());
-        setmealDTOPage.setRecords(list);
-        return Result.success(setmealDTOPage);
+        log.info("分页查询：page {}, pageSize {}, name {}", page, pageSize, name);
+        Page<SetmealDTO> pageInfo = setmealDishService.pageWithDish(page, pageSize, name);
+        return Result.success(pageInfo);
     }
 
-    @PostMapping("/add")
-    public Result<String> saveWithDish(@RequestBody SetmealDTO setmealDto) {
-        log.info("套餐信息：{}", setmealDto);
-        setmealService.saveWithDish(setmealDto);
-        return Result.success("套餐添加成功");
-    }
-
+    /**
+     * 套餐详情查询
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}")
     public Result<SetmealDTO> getWithDish(@PathVariable Long id) {
-        SetmealDTO setmealDTO = setmealService.getWithDishById(id);
-        log.info("查询到的数据为：{}", setmealDTO);
+        SetmealDTO setmealDTO = setmealDishService.getWithDishById(id);
+        log.info("查询套餐信息：{}", setmealDTO);
         return Result.success(setmealDTO);
     }
 
+    /**
+     * 添加套餐
+     * @param setmealDto
+     * @return
+     */
+    @PostMapping("/add")
+    public Result<String> addWithDish(@RequestBody SetmealDTO setmealDto) {
+        log.info("添加套餐信息：{}", setmealDto);
+        setmealDishService.addWithDish(setmealDto);
+        return Result.success("套餐添加成功");
+    }
+
+    /**
+     * 更新套餐
+     * @param setmealDto
+     * @return
+     */
     @PostMapping("/edit")
     public Result<String> updateWithDish(@RequestBody SetmealDTO setmealDto) {
-        log.info("套餐信息：{}", setmealDto);
-        setmealService.updateWithDish(setmealDto);
+        log.info("更新套餐信息：{}", setmealDto);
+        setmealDishService.updateWithDish(setmealDto);
         return Result.success("套餐添加成功");
+    }
+
+    /**
+     * 启售/停售套餐（批量）
+     * @param status
+     * @param ids
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    public Result<String> updateStatus(@PathVariable Integer status, @RequestParam List<Long> ids) {
+        if (status == 1) {
+            log.info("启售套餐id：{}", ids);
+        } else {
+            log.info("停售套餐id：{}", ids);
+        }
+        setmealService.updateStatus(status, ids);
+        return Result.success(status == 1 ? "启售成功" : "停售成功");
+    }
+
+    /**
+     * 删除套餐（批量）
+     * @param ids
+     * @return
+     */
+    @DeleteMapping
+    public Result<String> deleteByIds(@RequestParam List<Long> ids) {
+        log.info("删除套餐id：{}",ids);
+        setmealDishService.removeWithDish(ids);
+        return Result.success("删除成功");
     }
 }
