@@ -13,7 +13,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -25,6 +24,11 @@ public class CommonController {
     @Value("${fanfan.path}")
     private String basePath;
 
+    /**
+     * 上传文件
+     * @param file
+     * @return
+     */
     @PostMapping("/upload")
     public Result<String> upload(MultipartFile file) {
         log.info("获取文件: {}", file.toString());
@@ -49,6 +53,11 @@ public class CommonController {
         return Result.success(fileName);
     }
 
+    /**
+     * 下载文件
+     * @param name
+     * @param response
+     */
     @GetMapping("/download")
     public void download(String name, HttpServletResponse response) {
         try (FileInputStream fis = new FileInputStream(basePath + name);

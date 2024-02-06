@@ -57,7 +57,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     @Override
     public Page<Category> pageWithType(int page, int pageSize, String type) {
         //分页构造器
-        Page<Category> pageInfo = new Page<>(page, pageSize);
+        Page<Category> categoryPage = new Page<>(page, pageSize);
         //条件查询器
         LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
         // 添加类型条件
@@ -65,7 +65,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         //添加排序条件
         queryWrapper.orderByDesc(Category::getSort);
         //分页查询
-        return this.page(pageInfo, queryWrapper);
+        return this.page(categoryPage, queryWrapper);
     }
 
     @Override

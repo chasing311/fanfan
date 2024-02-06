@@ -1,6 +1,5 @@
 package com.chasing.fan.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chasing.fan.common.Result;
 import com.chasing.fan.entity.Category;
@@ -62,7 +61,7 @@ public class CategoryController {
      */
     @DeleteMapping
     private Result<String> delete(Long id) {
-        log.info("将被删除的id：{}", id);
+        log.info("删除分类的id：{}", id);
         categoryService.remove(id);
         return Result.success("分类信息删除成功");
     }
@@ -74,6 +73,7 @@ public class CategoryController {
      */
     @GetMapping("/list")
     public Result<List<Category>> list(Category category) {
+        log.info("分类列表查询, type={}", category.getType());
         List<Category> list = categoryService.listByType(category.getType());
         return Result.success(list);
     }

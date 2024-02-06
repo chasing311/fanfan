@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class SetmealDishImpl extends ServiceImpl<SetmealDishMapper, SetmealDish> implements SetmealDishService {
+public class SetmealDishServiceImpl extends ServiceImpl<SetmealDishMapper, SetmealDish> implements SetmealDishService {
     @Autowired
     SetmealService setmealService;
     @Autowired
@@ -78,15 +78,15 @@ public class SetmealDishImpl extends ServiceImpl<SetmealDishMapper, SetmealDish>
 
     @Override
     public Page<SetmealDTO> pageWithDish(int page, int pageSize, String name) {
-        Page<Setmeal> pageInfo = new Page<>(page, pageSize);
+        Page<Setmeal> setmealPage = new Page<>(page, pageSize);
         Page<SetmealDTO> setmealDTOPage = new Page<>(page, pageSize);
         LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.like(name != null, Setmeal::getName, name);
         queryWrapper.orderByDesc(Setmeal::getUpdateTime);
-        setmealService.page(pageInfo, queryWrapper);
-        BeanUtils.copyProperties(pageInfo, setmealDTOPage, "records");
+        setmealService.page(setmealPage, queryWrapper);
+        BeanUtils.copyProperties(setmealPage, setmealDTOPage, "records");
 
-        List<Setmeal> records = pageInfo.getRecords();
+        List<Setmeal> records = setmealPage.getRecords();
 
         List<SetmealDTO> list = records.stream().map((item) -> {
             SetmealDTO setmealDto = new SetmealDTO();
