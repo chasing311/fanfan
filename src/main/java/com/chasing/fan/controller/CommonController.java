@@ -26,7 +26,7 @@ public class CommonController {
     private String basePath;
 
     @PostMapping("/upload")
-    public Result<String> update(MultipartFile file) {
+    public Result<String> upload(MultipartFile file) {
         log.info("获取文件: {}", file.toString());
         File dir = new File(basePath);
         if (!dir.exists()) {

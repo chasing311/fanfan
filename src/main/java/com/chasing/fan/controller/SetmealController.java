@@ -29,7 +29,7 @@ public class SetmealController {
      */
     @GetMapping("/page")
     public Result<Page<SetmealDTO>> page(int page, int pageSize, String name) {
-        log.info("分页查询：page {}, pageSize {}, name {}", page, pageSize, name);
+        log.info("套餐分页查询：page={}, pageSize={}, name={}", page, pageSize, name);
         Page<SetmealDTO> pageInfo = setmealDishService.pageWithDish(page, pageSize, name);
         return Result.success(pageInfo);
     }
