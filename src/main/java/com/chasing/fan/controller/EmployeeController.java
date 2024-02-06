@@ -102,7 +102,7 @@ public class EmployeeController {
      */
     @GetMapping("/page")
     public Result<Page<Employee>> page(int page, int pageSize, String name) {
-        log.info("员工分页查询, page={},pageSize={},name={}", page, pageSize, name);
+        log.info("员工分页查询, page={}, pageSize={}, name={}", page, pageSize, name);
         Page<Employee> pageInfo = employeeService.pageWithName(page, pageSize, name);
         return Result.success(pageInfo);
     }

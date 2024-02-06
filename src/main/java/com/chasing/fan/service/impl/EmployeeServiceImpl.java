@@ -20,9 +20,9 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     @Override
     public Page<Employee> pageWithName(int page, int pageSize, String name) {
         Page<Employee> pageInfo = new Page<>(page, pageSize);
-        LambdaQueryWrapper<Employee> wrapper = new LambdaQueryWrapper<>();
-        wrapper.like(!(name == null || name.isEmpty()), Employee::getName, name);
-        wrapper.orderByDesc(Employee::getUpdateTime);
-        return this.page(pageInfo, wrapper);
+        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(!(name == null || name.isEmpty()), Employee::getName, name);
+        queryWrapper.orderByDesc(Employee::getUpdateTime);
+        return this.page(pageInfo, queryWrapper);
     }
 }

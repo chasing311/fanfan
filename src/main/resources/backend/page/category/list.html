@@ -15,21 +15,26 @@
     <div class="container">
       <div
         class="tableBar"
-        style="display: inline-block"
       >
-        <el-button
-          type="primary"
-          class="continue"
-          @click="addClass('class')"
-        >
-          + 新增菜品分类
-        </el-button>
-        <el-button
-          type="primary"
-          @click="addClass('meal')"
-        >
-          + 新增套餐分类
-        </el-button>
+        <el-select v-model="searchType" clearable placeholder="请选择分类类型" @change="handleSearchTypeChange">
+          <el-option label="菜品分类" value="1"></el-option>
+          <el-option label="套餐分类" value="2"></el-option>
+        </el-select>
+        <div>
+          <el-button
+            type="primary"
+            class="continue"
+            @click="addClass('class')"
+          >
+            + 新增菜品分类
+          </el-button>
+          <el-button
+            type="primary"
+            @click="addClass('meal')"
+          >
+            + 新增套餐分类
+          </el-button>
+        </div>
       </div>
       <el-table
         :data="tableData"
@@ -158,6 +163,7 @@
             pageSize: 10,
             tableData: [],
             type :'',
+            searchType: '',
             classData: {
               'title': '添加菜品分类',
               'dialogVisible': false,
@@ -176,7 +182,7 @@
         },
         methods: {
           async init () {
-            await getCategoryPage({'page': this.page, 'pageSize': this.pageSize}).then(res => {
+            await getCategoryPage({'page': this.page, 'pageSize': this.pageSize, 'type': this.searchType }).then(res => {
               if (String(res.code) === '1') {
                 this.tableData = res.data.records
                 this.counts = Number(res.data.total)
@@ -297,7 +303,10 @@
           handleCurrentChange (val) {
             this.page = val
             this.init()
-          }
+          },
+          handleSearchTypeChange () {
+            this.init()
+          },
         }
       })
     </script>

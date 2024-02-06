@@ -25,7 +25,7 @@ public class CategoryController {
      */
     @PostMapping("/add")
     public Result<String> save(@RequestBody Category category) {
-        log.info("category:{}", category);
+        log.info("添加分类信息: {}", category);
         categoryService.save(category);
         return Result.success(category.getType() == 1 ? "添加菜品分类成功！" : "添加套餐分类成功！");
     }
@@ -37,7 +37,7 @@ public class CategoryController {
      */
     @PostMapping("/edit")
     public Result<String> update(@RequestBody Category category) {
-        log.info("category:{}", category);
+        log.info("修改分类信息: {}", category);
         categoryService.updateById(category);
         return Result.success(category.getType() == 1 ? "修改菜品分类成功！" : "修改套餐分类成功！");
     }
@@ -49,15 +49,9 @@ public class CategoryController {
      * @return
      */
     @GetMapping("/page")
-    public Result<Page<Category>> page(int page, int pageSize) {
-        //分页构造器
-        Page<Category> pageInfo = new Page<>(page, pageSize);
-        //条件查询器
-        LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
-        //添加排序条件
-        queryWrapper.orderByDesc(Category::getSort);
-        //分页查询
-        categoryService.page(pageInfo, queryWrapper);
+    public Result<Page<Category>> page(int page, int pageSize, String type) {
+        log.info("分类分页查询, page={}, pageSize={}, type={}", page, pageSize, type);
+        Page<Category> pageInfo = categoryService.pageWithType(page, pageSize, type);
         return Result.success(pageInfo);
     }
 
@@ -80,15 +74,7 @@ public class CategoryController {
      */
     @GetMapping("/list")
     public Result<List<Category>> list(Category category) {
-        //条件构造器
-        LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
-        //添加条件，这里只需要判断是否为菜品（type为1是菜品，type为2是套餐）
-        queryWrapper.eq(category.getType() != null,Category::getType,category.getType());
-        //添加排序条件
-        queryWrapper.orderByAsc(Category::getSort).orderByDesc(Category::getUpdateTime);
-        //查询数据
-        List<Category> list = categoryService.list(queryWrapper);
-        //返回数据
+        List<Category> list = categoryService.listByType(category.getType());
         return Result.success(list);
     }
 }
