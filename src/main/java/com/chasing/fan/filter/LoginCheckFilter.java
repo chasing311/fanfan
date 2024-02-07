@@ -31,12 +31,15 @@ public class LoginCheckFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         String requestURI = request.getRequestURI();
 
-        String[] urlWhiteList = new String[]{
-            "/employee/login",
-            "/employee/logout",
-            "/backend/**",
-            "/front/**",
-            "/common/**"
+        String[] urlWhiteList = new String[] {
+                "/employee/login",
+                "/employee/logout",
+                "/backend/**",
+                "/front/**",
+                "/common/**",
+                //对用户登陆操作放行
+                "/user/login",
+                "/user/sendMsg"
         };
         if (isUriInWhiteList(requestURI, urlWhiteList)) {
             filterChain.doFilter(request, response);
@@ -44,7 +47,13 @@ public class LoginCheckFilter implements Filter {
         }
         if (request.getSession().getAttribute("employee") != null) {
             Long empId = (Long) request.getSession().getAttribute("employee");
-//            BaseContext.setCurrentId(empId);
+            filterChain.doFilter(request,response);
+            return;
+        }
+
+        //判断用户是否登录
+        if(request.getSession().getAttribute("user") != null){
+            Long userId = (Long) request.getSession().getAttribute("user");
             filterChain.doFilter(request,response);
             return;
         }
