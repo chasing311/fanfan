@@ -2,6 +2,7 @@ package com.chasing.fan.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chasing.fan.common.Result;
+import com.chasing.fan.common.SessionUtil;
 import com.chasing.fan.entity.Employee;
 import com.chasing.fan.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 @Slf4j
 @RestController
@@ -21,12 +23,12 @@ public class EmployeeController {
 
     /**
      * 员工登录
-     * @param request
      * @param employee
+     * @param session
      * @return
      */
     @PostMapping("/login")
-    public Result<Employee> login(HttpServletRequest request, @RequestBody Employee employee) {
+    public Result<Employee> login(@RequestBody Employee employee, HttpSession session) {
         //1、将页面提交的密码password进行md5加密处理
         String password = employee.getPassword();
         password = DigestUtils.md5DigestAsHex(password.getBytes());
@@ -35,36 +37,37 @@ public class EmployeeController {
         Employee emp = employeeService.getByUsername(employee.getUsername());
 
         //3、如果没有查询到则返回登录失败结果
-        if(emp == null){
+        if (emp == null) {
             return Result.error("登录失败");
         }
 
         //4、密码比对，如果不一致则返回登录失败结果
-        if(!emp.getPassword().equals(password)){
+        if (!emp.getPassword().equals(password)) {
             return Result.error("登录失败");
         }
 
         //5、查看员工状态，如果为已禁用状态，则返回员工已禁用结果
-        if(emp.getStatus() == 0){
+        if (emp.getStatus() == 0) {
             return Result.error("账号已禁用");
         }
 
         log.info("员工登录: {}", emp.getId());
         //6、登录成功，将员工id存入Session并返回登录成功结果
-        request.getSession().setAttribute("employee", emp.getId());
+        SessionUtil.setEmpId(session, emp.getId());
         return Result.success(emp);
     }
 
     /**
      * 员工退出
-     * @param request
+     * @param session
      * @return
      */
     @PostMapping("/logout")
-    public Result<String> logout(HttpServletRequest request){
-        log.info("员工退出: {}", request.getSession().getAttribute("employee"));
+    public Result<String> logout(HttpSession session) {
+        Long empId = SessionUtil.getEmpId(session);
+        log.info("员工退出: {}", empId);
         //清理Session中保存的当前登录员工的id
-        request.getSession().removeAttribute("employee");
+        SessionUtil.removeEmpId(session);
         return Result.success("退出成功");
     }
 
@@ -75,7 +78,7 @@ public class EmployeeController {
      */
     @PostMapping("/add")
     public Result<String> save(@RequestBody Employee employee){
-        log.info("新增员工信息：{}",employee.toString());
+        log.info("新增员工信息：{}", employee.toString());
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
         employeeService.save(employee);
         return Result.success("添加员工成功");

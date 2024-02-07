@@ -22,8 +22,8 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
         log.info(metaObject.toString());
         metaObject.setValue("createTime", LocalDateTime.now());
         metaObject.setValue("updateTime", LocalDateTime.now());
-        metaObject.setValue("createUser", request.getSession().getAttribute("employee"));
-        metaObject.setValue("updateUser", request.getSession().getAttribute("employee"));
+        metaObject.setValue("createUser", SessionUtil.getEmpId(request.getSession()));
+        metaObject.setValue("updateUser", SessionUtil.getEmpId(request.getSession()));
     }
 
     @Override
@@ -31,7 +31,7 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
         log.info("公共字段自动填充(update)...");
         log.info(metaObject.toString());
         metaObject.setValue("updateTime", LocalDateTime.now());
-        metaObject.setValue("updateUser", request.getSession().getAttribute("employee"));
+        metaObject.setValue("updateUser", SessionUtil.getEmpId(request.getSession()));
 //        BaseContext.close();
     }
 }

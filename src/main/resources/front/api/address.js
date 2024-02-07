@@ -17,7 +17,7 @@ function addressLastUpdateApi() {
 //新增地址
 function  addAddressApi(data){
     return $axios({
-        'url': '/addressBook',
+        'url': '/addressBook/add',
         'method': 'post',
         data
       })
@@ -26,8 +26,8 @@ function  addAddressApi(data){
 //修改地址
 function  updateAddressApi(data){
     return $axios({
-        'url': '/addressBook',
-        'method': 'put',
+        'url': '/addressBook/edit',
+        'method': 'post',
         data
       })
 }

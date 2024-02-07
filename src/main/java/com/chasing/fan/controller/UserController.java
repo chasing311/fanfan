@@ -2,6 +2,7 @@ package com.chasing.fan.controller;
 
 import com.chasing.fan.common.MailUtil;
 import com.chasing.fan.common.Result;
+import com.chasing.fan.common.SessionUtil;
 import com.chasing.fan.entity.User;
 import com.chasing.fan.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -69,7 +70,7 @@ public class UserController {
                 userService.save(user);
                 log.info("新用户: {}", "用户" + codeInSession);
             }
-            session.setAttribute("user", user.getId());
+            SessionUtil.setUserId(session, user.getId());
             return Result.success(user);
         }
         return Result.error("登录失败");
