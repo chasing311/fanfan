@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface SetmealService extends IService<Setmeal> {
     void updateStatus(int status, List<Long> ids);
+    List<Setmeal> listByCategoryId(Long categoryId);
 }

@@ -2,6 +2,7 @@ package com.chasing.fan.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chasing.fan.common.Result;
+import com.chasing.fan.entity.Setmeal;
 import com.chasing.fan.entity.SetmealDTO;
 import com.chasing.fan.service.SetmealDishService;
 import com.chasing.fan.service.SetmealService;
@@ -32,6 +33,18 @@ public class SetmealController {
         log.info("套餐分页查询：page={}, pageSize={}, name={}", page, pageSize, name);
         Page<SetmealDTO> pageInfo = setmealDishService.pageWithDish(page, pageSize, name);
         return Result.success(pageInfo);
+    }
+
+    /**
+     * 套餐列表查询
+     * @param categoryId
+     * @return
+     */
+    @GetMapping("/list")
+    public Result<List<Setmeal>> list(Long categoryId) {
+        log.info("查询套餐列表：{}", categoryId);
+        List<Setmeal> setmealList = setmealService.listByCategoryId(categoryId);
+        return Result.success(setmealList);
     }
 
     /**

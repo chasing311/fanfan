@@ -28,4 +28,13 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         updateWrapper.set(Setmeal::getStatus, status);
         this.update(updateWrapper);
     }
+
+    @Override
+    public List<Setmeal> listByCategoryId(Long categoryId) {
+        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(true, Setmeal::getCategoryId, categoryId);
+        queryWrapper.eq(true, Setmeal::getStatus, 1);
+        queryWrapper.orderByDesc(Setmeal::getUpdateTime);
+        return this.list(queryWrapper);
+    }
 }
