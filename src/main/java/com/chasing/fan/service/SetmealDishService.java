@@ -13,4 +13,5 @@ public interface SetmealDishService extends IService<SetmealDish> {
     void updateWithDish(SetmealDTO setmealDTO);
     SetmealDTO getWithDishById(Long id);
     Page<SetmealDTO> pageWithDish(int page, int pageSize, String name);
+    List<SetmealDish> listBySetmealId(Long setmealId);
 }

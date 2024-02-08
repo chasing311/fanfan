@@ -2,15 +2,17 @@ package com.chasing.fan.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chasing.fan.common.Result;
-import com.chasing.fan.entity.Setmeal;
-import com.chasing.fan.entity.SetmealDTO;
+import com.chasing.fan.entity.*;
+import com.chasing.fan.service.DishService;
 import com.chasing.fan.service.SetmealDishService;
 import com.chasing.fan.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/setmeal")
@@ -20,6 +22,8 @@ public class SetmealController {
     private SetmealService setmealService;
     @Autowired
     private SetmealDishService setmealDishService;
+    @Autowired
+    private DishService dishService;
 
     /**
      * 套餐分页查询
@@ -57,6 +61,25 @@ public class SetmealController {
         SetmealDTO setmealDTO = setmealDishService.getWithDishById(id);
         log.info("查询套餐信息：{}", setmealDTO);
         return Result.success(setmealDTO);
+    }
+
+    /**
+     * 套餐菜品详情查询
+     * @param id
+     * @return
+     */
+    @GetMapping("/dish/{id}")
+    public Result<List<DishDTO>> getSetmealDishes(@PathVariable Long id) {
+        List<SetmealDish> setmealDishList = setmealDishService.listBySetmealId(id);
+        List<DishDTO> dishDTOList = setmealDishList.stream().map(item -> {
+            DishDTO dishDTO = new DishDTO();
+            BeanUtils.copyProperties(item, dishDTO);
+            Long dishId = item.getDishId();
+            Dish dish = dishService.getById(dishId);
+            BeanUtils.copyProperties(dish, dishDTO);
+            return dishDTO;
+        }).collect(Collectors.toList());
+        return Result.success(dishDTOList);
     }
 
     /**

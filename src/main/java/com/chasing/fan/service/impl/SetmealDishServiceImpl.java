@@ -99,4 +99,12 @@ public class SetmealDishServiceImpl extends ServiceImpl<SetmealDishMapper, Setme
         setmealDTOPage.setRecords(list);
         return setmealDTOPage;
     }
+
+    @Override
+    public List<SetmealDish> listBySetmealId(Long setmealId) {
+        LambdaQueryWrapper<SetmealDish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        dishLambdaQueryWrapper.eq(SetmealDish::getSetmealId, setmealId);
+        return this.list(dishLambdaQueryWrapper);
+
+    }
 }
