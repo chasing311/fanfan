@@ -32,7 +32,7 @@ public class DishController {
     @GetMapping("/page")
     public Result<Page<DishDTO>> page(int page, int pageSize, String name) {
         log.info("菜品分页查询, page={}, pageSize={}, type={}", page, pageSize, name);
-        Page<DishDTO> dishDTOPage = dishService.pageWithCategory(page, pageSize, name);
+        Page<DishDTO> dishDTOPage = dishFlavorService.pageWithCategory(page, pageSize, name);
         return Result.success(dishDTOPage);
     }
 
@@ -55,9 +55,9 @@ public class DishController {
      * @return
      */
     @GetMapping("/list")
-    public Result<List<Dish>> get(Dish dish) {
+    public Result<List<DishDTO>> get(Dish dish) {
         log.info("菜品列表查询: categoryId={}", dish.getCategoryId());
-        List<Dish> list = dishService.listByCategoryId(dish.getCategoryId());
+        List<DishDTO> list = dishFlavorService.listWithFlavorsByCategoryId(dish.getCategoryId());
         return Result.success(list);
     }
 
