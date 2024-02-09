@@ -49,20 +49,6 @@ public class OrderController {
     }
 
     /**
-     * 订单分页查询
-     * @param page
-     * @param pageSize
-     * @return
-     */
-    @GetMapping("/userPage")
-    public Result<Page<OrdersDTO>> page(int page, int pageSize, HttpSession session) {
-        Long userId = SessionUtil.getUserId(session);
-        log.info("订单分页查询, page={}, pageSize={}, type={}", page, pageSize, userId);
-        Page<OrdersDTO> ordersDTOPage = orderService.pageWithDetail(page, pageSize, userId);
-        return Result.success(ordersDTOPage);
-    }
-
-    /**
      * 再来一单
      * @param map
      * @param session
@@ -82,5 +68,48 @@ public class OrderController {
         }).collect(Collectors.toList());
         shoppingCartService.saveBatch(shoppingCartList);
         return Result.success("已添加到购物车");
+    }
+
+    /**
+     * 用户订单分页查询
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @GetMapping("/userPage")
+    public Result<Page<OrdersDTO>> page(int page, int pageSize, HttpSession session) {
+        Long userId = SessionUtil.getUserId(session);
+        log.info("用户订单分页查询, page={}, pageSize={}, userId={}", page, pageSize, userId);
+        Page<OrdersDTO> ordersDTOPage = orderService.pageWithDetailAndUserId(page, pageSize, userId);
+        return Result.success(ordersDTOPage);
+    }
+
+    /**
+     * 后台订单分页查询
+     * @param page
+     * @param pageSize
+     * @param number
+     * @param beginTime
+     * @param endTime
+     * @return
+     */
+    @GetMapping("/page")
+    public Result<Page<OrdersDTO>> page(int page, int pageSize, Long number, String beginTime, String endTime) {
+        log.info("订单分页查询, page={}, pageSize={}, number={}, beginTime={}, endTime={}", page, pageSize, number, beginTime, endTime);
+        Page<OrdersDTO> ordersDTOPage = orderService.pageWithNumberAndTime(page, pageSize, number, beginTime, endTime);
+        return Result.success(ordersDTOPage);
+    }
+
+    /**
+     * 订单状态修改
+     * @param map
+     * @return
+     */
+    @PutMapping
+    public Result<String> changeStatus(@RequestBody Map<String, String> map) {
+        Long orderId = Long.valueOf(map.get("id"));
+        int status = Integer.parseInt(map.get("status"));
+        orderService.changeStatus(orderId, status);
+        return Result.success("订单状态修改成功");
     }
 }
