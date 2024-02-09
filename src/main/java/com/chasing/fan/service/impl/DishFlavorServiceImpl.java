@@ -98,9 +98,9 @@ public class DishFlavorServiceImpl extends ServiceImpl<DishFlavorMapper, DishFla
                 dishDTO.setCategoryName(category.getName());
             }
             Long itemId = item.getId();
-            LambdaQueryWrapper<DishFlavor> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-            lambdaQueryWrapper.eq(itemId != null, DishFlavor::getDishId, itemId);
-            List<DishFlavor> flavors = this.list(lambdaQueryWrapper);
+            LambdaQueryWrapper<DishFlavor> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(itemId != null, DishFlavor::getDishId, itemId);
+            List<DishFlavor> flavors = this.list(queryWrapper);
             dishDTO.setFlavors(flavors);
             return dishDTO;
         }).collect(Collectors.toList());
