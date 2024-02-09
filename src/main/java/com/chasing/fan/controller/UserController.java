@@ -77,7 +77,7 @@ public class UserController {
     }
 
     /**
-     * 用户推出
+     * 用户退出
      * @param session
      * @return
      */
