@@ -75,4 +75,15 @@ public class UserController {
         }
         return Result.error("登录失败");
     }
+
+    /**
+     * 用户推出
+     * @param session
+     * @return
+     */
+    @PostMapping("/logout")
+    public Result<String> logout(HttpSession session) {
+        SessionUtil.removeUserId(session);
+        return Result.success("退出成功");
+    }
 }

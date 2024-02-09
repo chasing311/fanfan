@@ -23,4 +23,8 @@ public class SessionUtil {
     public static void setUserId(HttpSession session, Long userId) {
         session.setAttribute("user", userId);
     }
+    public static void removeUserId(HttpSession session) {
+        session.removeAttribute("user");
+    }
+
 }
