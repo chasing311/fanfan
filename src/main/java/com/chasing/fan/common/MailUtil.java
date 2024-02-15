@@ -30,6 +30,7 @@ public class MailUtil {
         props.put("mail.password", "lxxxibgwfagnbfhe");
         // 构建授权信息，用于进行SMTP进行身份验证
         Authenticator authenticator = new Authenticator() {
+            @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 // 用户名、密码
                 String userName = props.getProperty("mail.user");
@@ -50,7 +51,7 @@ public class MailUtil {
         // 设置邮件标题
         message.setSubject("FanFan 验证码");
         // 设置邮件的内容体
-        message.setContent("尊敬的用户:你好!\n注册验证码为:" + code + "(有效期为一分钟,请勿告知他人)", "text/html;charset=UTF-8");
+        message.setContent("尊敬的用户:你好!\n注册验证码为:" + code + "(有效期为三分钟,请勿告知他人)", "text/html;charset=UTF-8");
         // 发送邮件
         Transport.send(message);
     }

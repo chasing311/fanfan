@@ -21,7 +21,6 @@ public class DishController {
     private DishService dishService;
     @Autowired
     private DishFlavorService dishFlavorService;
-
     /**
      * 菜品分页查询
      * @param page

@@ -50,7 +50,7 @@ public class LoginCheckFilter implements Filter {
             return;
         }
 
-        request.getSession().setAttribute("user", 1755070372681441282L);
+//        request.getSession().setAttribute("user", 1755070372681441282L);
         //判断用户是否登录
         if(request.getSession().getAttribute("user") != null){
             filterChain.doFilter(request,response);
