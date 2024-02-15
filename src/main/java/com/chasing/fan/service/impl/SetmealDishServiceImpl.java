@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 public class SetmealDishServiceImpl extends ServiceImpl<SetmealDishMapper, SetmealDish> implements SetmealDishService {
     @Autowired
     SetmealService setmealService;
+
     @Autowired
     CategoryService categoryService;
 
@@ -39,17 +40,17 @@ public class SetmealDishServiceImpl extends ServiceImpl<SetmealDishMapper, Setme
     @Override
     public void removeWithDish(List<Long> ids) {
         //先判断一下能不能删，如果status为1，则套餐在售，不能删
-        LambdaQueryWrapper<Setmeal> setmealLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        setmealLambdaQueryWrapper.in(Setmeal::getId, ids);
-        setmealLambdaQueryWrapper.eq(Setmeal::getStatus, 1);
-        int count = setmealService.count(setmealLambdaQueryWrapper);
+        LambdaQueryWrapper<Setmeal> setmealQueryWrapper = new LambdaQueryWrapper<>();
+        setmealQueryWrapper.in(Setmeal::getId, ids);
+        setmealQueryWrapper.eq(Setmeal::getStatus, 1);
+        int count = setmealService.count(setmealQueryWrapper);
         if (count > 0) {
             throw new CustomException("套餐正在售卖中，请先停售再进行删除");
         }
         setmealService.removeByIds(ids);
-        LambdaQueryWrapper<SetmealDish> setmealDishLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        setmealDishLambdaQueryWrapper.in(SetmealDish::getSetmealId, ids);
-        this.remove(setmealDishLambdaQueryWrapper);
+        LambdaQueryWrapper<SetmealDish> setmealDishQueryWrapper = new LambdaQueryWrapper<>();
+        setmealDishQueryWrapper.in(SetmealDish::getSetmealId, ids);
+        this.remove(setmealDishQueryWrapper);
     }
 
     @Override
@@ -102,9 +103,9 @@ public class SetmealDishServiceImpl extends ServiceImpl<SetmealDishMapper, Setme
 
     @Override
     public List<SetmealDish> listBySetmealId(Long setmealId) {
-        LambdaQueryWrapper<SetmealDish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        dishLambdaQueryWrapper.eq(SetmealDish::getSetmealId, setmealId);
-        return this.list(dishLambdaQueryWrapper);
+        LambdaQueryWrapper<SetmealDish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SetmealDish::getSetmealId, setmealId);
+        return this.list(queryWrapper);
 
     }
 }

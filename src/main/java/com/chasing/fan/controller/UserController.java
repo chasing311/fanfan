@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
@@ -25,7 +26,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
+    @Resource
     private RedisTemplate<String, String> redisTemplate;
 
     /**

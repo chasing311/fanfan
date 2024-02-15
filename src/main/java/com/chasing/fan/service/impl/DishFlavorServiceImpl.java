@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public class DishFlavorServiceImpl extends ServiceImpl<DishFlavorMapper, DishFlavor> implements DishFlavorService {
     @Autowired
     private DishService dishService;
+
     @Autowired
     private CategoryService categoryService;
 
@@ -89,8 +90,8 @@ public class DishFlavorServiceImpl extends ServiceImpl<DishFlavorMapper, DishFla
 
     @Override
     public List<DishDTO> listWithFlavorsByCategoryId(Long categoryId) {
-        List<Dish> list = dishService.listByCategoryId(categoryId);
-        List<DishDTO> dishDTOList = list.stream().map((item) -> {
+        List<Dish> dishList = dishService.listByCategoryId(categoryId);
+        List<DishDTO> dishDTOList = dishList.stream().map((item) -> {
             DishDTO dishDTO = new DishDTO();
             BeanUtils.copyProperties(item, dishDTO);
             Category category = categoryService.getById(categoryId);

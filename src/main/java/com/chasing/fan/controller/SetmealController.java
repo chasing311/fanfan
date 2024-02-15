@@ -9,8 +9,10 @@ import com.chasing.fan.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,10 +22,19 @@ import java.util.stream.Collectors;
 public class SetmealController {
     @Autowired
     private SetmealService setmealService;
+
     @Autowired
     private SetmealDishService setmealDishService;
+
     @Autowired
     private DishService dishService;
+
+    @Resource
+    private RedisTemplate<String, List<Setmeal>> redisTemplate;
+
+    private String cacheKey(Setmeal setmeal) {
+        return "setmeal_" + setmeal.getCategoryId();
+    }
 
     /**
      * 套餐分页查询
@@ -41,13 +52,20 @@ public class SetmealController {
 
     /**
      * 套餐列表查询
-     * @param categoryId
+     * @param setmeal
      * @return
      */
     @GetMapping("/list")
-    public Result<List<Setmeal>> list(Long categoryId) {
-        log.info("查询套餐列表：{}", categoryId);
-        List<Setmeal> setmealList = setmealService.listByCategoryId(categoryId);
+    public Result<List<Setmeal>> list(Setmeal setmeal) {
+        log.info("套餐列表查询：{}", setmeal.getCategoryId());
+        String cacheKey = cacheKey(setmeal);
+        List<Setmeal> setmealList = redisTemplate.opsForValue().get(cacheKey);
+        if (setmealList != null) {
+            log.info("套餐列表查询: {} 命中Redis缓存", setmeal.getCategoryId());
+            return Result.success(setmealList);
+        }
+        setmealList = setmealService.listByCategoryId(setmeal.getCategoryId());
+        redisTemplate.opsForValue().set(cacheKey, setmealList);
         return Result.success(setmealList);
     }
 
@@ -59,7 +77,7 @@ public class SetmealController {
     @GetMapping("/{id}")
     public Result<SetmealDTO> getWithDish(@PathVariable Long id) {
         SetmealDTO setmealDTO = setmealDishService.getWithDishById(id);
-        log.info("查询套餐信息：{}", setmealDTO);
+        log.info("套餐信息查询：{}", setmealDTO);
         return Result.success(setmealDTO);
     }
 
@@ -84,25 +102,29 @@ public class SetmealController {
 
     /**
      * 添加套餐
-     * @param setmealDto
+     * @param setmealDTO
      * @return
      */
     @PostMapping("/add")
-    public Result<String> addWithDish(@RequestBody SetmealDTO setmealDto) {
-        log.info("添加套餐信息：{}", setmealDto);
-        setmealDishService.addWithDish(setmealDto);
+    public Result<String> addWithDish(@RequestBody SetmealDTO setmealDTO) {
+        log.info("添加套餐信息：{}", setmealDTO);
+        String cacheKey = cacheKey(setmealDTO);
+        redisTemplate.delete(cacheKey);
+        setmealDishService.addWithDish(setmealDTO);
         return Result.success("套餐添加成功");
     }
 
     /**
      * 更新套餐
-     * @param setmealDto
+     * @param setmealDTO
      * @return
      */
     @PostMapping("/edit")
-    public Result<String> updateWithDish(@RequestBody SetmealDTO setmealDto) {
-        log.info("更新套餐信息：{}", setmealDto);
-        setmealDishService.updateWithDish(setmealDto);
+    public Result<String> updateWithDish(@RequestBody SetmealDTO setmealDTO) {
+        log.info("更新套餐信息：{}", setmealDTO);
+        String cacheKey = cacheKey(setmealDTO);
+        redisTemplate.delete(cacheKey);
+        setmealDishService.updateWithDish(setmealDTO);
         return Result.success("套餐添加成功");
     }
 
@@ -119,6 +141,8 @@ public class SetmealController {
         } else {
             log.info("停售套餐id：{}", ids);
         }
+        List<Setmeal> setmealList = setmealService.listByIds(ids);
+        setmealList.forEach(setmeal -> redisTemplate.delete(cacheKey(setmeal)));
         setmealService.updateStatus(status, ids);
         return Result.success(status == 1 ? "启售成功" : "停售成功");
     }
