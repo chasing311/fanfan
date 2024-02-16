@@ -86,9 +86,9 @@ public class DishController {
     @PostMapping("/add")
     public Result<String> saveWithFlavor(@RequestBody DishDTO dishDTO) {
         log.info("添加菜品信息: {}", dishDTO);
+        dishFlavorService.saveWithFlavor(dishDTO);
         String cacheKey = cacheKey(dishDTO);
         redisTemplate.delete(cacheKey);
-        dishFlavorService.saveWithFlavor(dishDTO);
         return Result.success("新增菜品成功");
     }
 
@@ -100,9 +100,9 @@ public class DishController {
     @PostMapping("/edit")
     public Result<String> updateWithFlavor(@RequestBody DishDTO dishDTO) {
         log.info("修改菜品信息: {}", dishDTO);
+        dishFlavorService.updateWithFlavor(dishDTO);
         String cacheKey = cacheKey(dishDTO);
         redisTemplate.delete(cacheKey);
-        dishFlavorService.updateWithFlavor(dishDTO);
         return Result.success("修改菜品成功");
     }
 

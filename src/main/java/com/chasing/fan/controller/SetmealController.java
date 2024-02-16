@@ -108,9 +108,9 @@ public class SetmealController {
     @PostMapping("/add")
     public Result<String> addWithDish(@RequestBody SetmealDTO setmealDTO) {
         log.info("添加套餐信息：{}", setmealDTO);
+        setmealDishService.addWithDish(setmealDTO);
         String cacheKey = cacheKey(setmealDTO);
         redisTemplate.delete(cacheKey);
-        setmealDishService.addWithDish(setmealDTO);
         return Result.success("套餐添加成功");
     }
 
@@ -122,9 +122,9 @@ public class SetmealController {
     @PostMapping("/edit")
     public Result<String> updateWithDish(@RequestBody SetmealDTO setmealDTO) {
         log.info("更新套餐信息：{}", setmealDTO);
+        setmealDishService.updateWithDish(setmealDTO);
         String cacheKey = cacheKey(setmealDTO);
         redisTemplate.delete(cacheKey);
-        setmealDishService.updateWithDish(setmealDTO);
         return Result.success("套餐添加成功");
     }
 
@@ -142,8 +142,8 @@ public class SetmealController {
             log.info("停售套餐id：{}", ids);
         }
         List<Setmeal> setmealList = setmealService.listByIds(ids);
-        setmealList.forEach(setmeal -> redisTemplate.delete(cacheKey(setmeal)));
         setmealService.updateStatus(status, ids);
+        setmealList.forEach(setmeal -> redisTemplate.delete(cacheKey(setmeal)));
         return Result.success(status == 1 ? "启售成功" : "停售成功");
     }
 
