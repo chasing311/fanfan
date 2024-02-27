@@ -9,6 +9,8 @@ import com.chasing.fan.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,10 +34,6 @@ public class SetmealController {
     @Resource
     private RedisTemplate<String, List<Setmeal>> redisTemplate;
 
-    private String cacheKey(Setmeal setmeal) {
-        return "setmeal_" + setmeal.getCategoryId();
-    }
-
     /**
      * 套餐分页查询
      * @param page
@@ -56,16 +54,10 @@ public class SetmealController {
      * @return
      */
     @GetMapping("/list")
+    @Cacheable(value = "setmealCache", key = "#setmeal.categoryId")
     public Result<List<Setmeal>> list(Setmeal setmeal) {
         log.info("套餐列表查询：{}", setmeal.getCategoryId());
-        String cacheKey = cacheKey(setmeal);
-        List<Setmeal> setmealList = redisTemplate.opsForValue().get(cacheKey);
-        if (setmealList != null) {
-            log.info("套餐列表查询: {} 命中Redis缓存", setmeal.getCategoryId());
-            return Result.success(setmealList);
-        }
-        setmealList = setmealService.listByCategoryId(setmeal.getCategoryId());
-        redisTemplate.opsForValue().set(cacheKey, setmealList);
+        List<Setmeal> setmealList = setmealService.listByCategoryId(setmeal.getCategoryId());
         return Result.success(setmealList);
     }
 
@@ -106,11 +98,10 @@ public class SetmealController {
      * @return
      */
     @PostMapping("/add")
+    @CacheEvict(value = "setmealCache", key = "#setmealDTO.categoryId")
     public Result<String> addWithDish(@RequestBody SetmealDTO setmealDTO) {
         log.info("添加套餐信息：{}", setmealDTO);
         setmealDishService.addWithDish(setmealDTO);
-        String cacheKey = cacheKey(setmealDTO);
-        redisTemplate.delete(cacheKey);
         return Result.success("套餐添加成功");
     }
 
@@ -120,11 +111,10 @@ public class SetmealController {
      * @return
      */
     @PostMapping("/edit")
+    @CacheEvict(value = "setmealCache", key = "#setmealDTO.categoryId")
     public Result<String> updateWithDish(@RequestBody SetmealDTO setmealDTO) {
         log.info("更新套餐信息：{}", setmealDTO);
         setmealDishService.updateWithDish(setmealDTO);
-        String cacheKey = cacheKey(setmealDTO);
-        redisTemplate.delete(cacheKey);
         return Result.success("套餐添加成功");
     }
 
@@ -135,15 +125,14 @@ public class SetmealController {
      * @return
      */
     @PostMapping("/status/{status}")
+    @CacheEvict(value = "setmealCache", allEntries = true)
     public Result<String> updateStatus(@PathVariable Integer status, @RequestParam List<Long> ids) {
         if (status == 1) {
             log.info("启售套餐id：{}", ids);
         } else {
             log.info("停售套餐id：{}", ids);
         }
-        List<Setmeal> setmealList = setmealService.listByIds(ids);
         setmealService.updateStatus(status, ids);
-        setmealList.forEach(setmeal -> redisTemplate.delete(cacheKey(setmeal)));
         return Result.success(status == 1 ? "启售成功" : "停售成功");
     }
 
